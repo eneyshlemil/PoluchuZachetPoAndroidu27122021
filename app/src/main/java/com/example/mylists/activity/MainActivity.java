@@ -333,15 +333,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 mStudentListAdapter.colorChecked(position,parent);
             }
         };
-        AdapterView.OnItemLongClickListener longClickListenerStudent = new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-               phone_calling(view, position);
-                return true;
-            }
-        };
+//  del     AdapterView.OnItemLongClickListener longClickListenerStudent = new AdapterView.OnItemLongClickListener() {
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
+//               phone_calling(view, position);
+//                return true;
+//            }
+//        };
         listView.setOnItemClickListener(clStudent);
-        listView.setOnItemLongClickListener(longClickListenerStudent);
+//  del      listView.setOnItemLongClickListener(longClickListenerStudent);
     }
 
     @Override
