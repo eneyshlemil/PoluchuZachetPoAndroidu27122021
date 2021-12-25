@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static DrawerLayout drawer;
     private static NavigationView navigationView;
     private static boolean was_updated = false;
+
     public void phone_calling(View view,int position) {
         String phone_number = mStudents.get(position).getTelephone();
         Intent callIntent = new Intent(Intent.ACTION_CALL);
