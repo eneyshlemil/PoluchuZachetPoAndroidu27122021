@@ -27,7 +27,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.mylists.R;
@@ -60,7 +62,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static DrawerLayout drawer;
     private static NavigationView navigationView;
     private static boolean was_updated = false;
-
     public void phone_calling(View view,int position) {
         String phone_number = mStudents.get(position).getTelephone();
         Intent callIntent = new Intent(Intent.ACTION_CALL);
@@ -314,11 +315,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         AdapterView.OnItemClickListener clStudent = new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(checkedItemPosition != position){
+                if((((LinearLayout) findViewById(R.id.ll_info_student)).getVisibility()==View.GONE) || checkedItemPosition != position){
                     listView.setItemChecked(position,true);
                     listView.setSelected(true);
+                    ((LinearLayout) findViewById(R.id.ll_info_student)).setVisibility(View.VISIBLE);
+                    ((TextView) findViewById(R.id.tvInfo_FIO)).setText(mStudents.get(position).getFIO());
+                    ((TextView) findViewById(R.id.tvInfo_Fac)).setText(mStudents.get(position).getNameFaculty());
+                    ((TextView) findViewById(R.id.tvInfo_Group)).setText(mStudents.get(position).getGroup());
+//  del                  ((TextView) findViewById(R.id.tvInfo_Phone)).setText(mStudents.get(position).getNameFaculty());
                     checkedItemPosition = position;
                 }else {
+                    ((LinearLayout) findViewById(R.id.ll_info_student)).setVisibility(View.GONE);
                     listView.setItemChecked(position,false);
                     listView.setSelected(false);
                     checkedItemPosition = -1;
