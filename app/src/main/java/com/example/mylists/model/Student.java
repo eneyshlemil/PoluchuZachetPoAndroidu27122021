@@ -16,15 +16,13 @@ public class Student implements Parcelable {
     private String nameFaculty;
     private String mGroup;
     private ArrayList<Subject> mSubjects;
-    private String mTelephone;
 
-    public Student(String FIO, Facultet faculty, String group, String telephone) {
+    public Student(String FIO, Facultet faculty, String group) {
         mFIO = FIO;
         nameFaculty = faculty.getName();
         IdFaculty = faculty.getId();
         mGroup = group;
         mSubjects = new ArrayList<>();
-        mTelephone = telephone;
         id = -1;
     }
 
@@ -42,13 +40,13 @@ public class Student implements Parcelable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Student student = (Student) o;
-        return id == student.id && mFIO.equals(student.mFIO) && IdFaculty.equals(student.IdFaculty) && nameFaculty.equals(student.nameFaculty) && mGroup.equals(student.mGroup) && Objects.equals(mSubjects, student.mSubjects) && mTelephone.equals(student.mTelephone);
+        return id == student.id && mFIO.equals(student.mFIO) && IdFaculty.equals(student.IdFaculty) && nameFaculty.equals(student.nameFaculty) && mGroup.equals(student.mGroup) && Objects.equals(mSubjects, student.mSubjects);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public int hashCode() {
-        return Objects.hash(id, mFIO, IdFaculty, nameFaculty, mGroup, mSubjects, mTelephone);
+        return Objects.hash(id, mFIO, IdFaculty, nameFaculty, mGroup, mSubjects);
     }
 
     protected Student(Parcel in) {
@@ -57,7 +55,6 @@ public class Student implements Parcelable {
         IdFaculty = in.readInt();
         mGroup = in.readString();
         mSubjects = in.createTypedArrayList(Subject.CREATOR);
-        mTelephone = in.readString();
         id = in.readInt();
     }
 
@@ -68,7 +65,6 @@ public class Student implements Parcelable {
         dest.writeInt(IdFaculty);
         dest.writeString(mGroup);
         dest.writeTypedList(mSubjects);
-        dest.writeString(mTelephone);
         dest.writeInt(id);
     }
 
@@ -151,7 +147,6 @@ public class Student implements Parcelable {
                 ", nameFaculty='" + nameFaculty + '\'' +
                 ", mGroup='" + mGroup + '\'' +
                 ", mSubjects=" + mSubjects +
-                ", mTelephone='" + mTelephone + '\'' +
                 '}';
     }
     public Student() {
@@ -160,15 +155,7 @@ public class Student implements Parcelable {
         IdFaculty = -1;
         mGroup = "";
         mSubjects = new ArrayList<>();
-        mTelephone = "";
         id = -1;
-    }
-    public String getTelephone() {
-        return mTelephone;
-    }
-
-    public void setTelephone(String mTelephone) {
-        this.mTelephone = mTelephone;
     }
 
     public static final class StudentContract {
@@ -177,7 +164,6 @@ public class Student implements Parcelable {
             public static final String ID = "id";
             public static final String ID_FACULTY = "id_faculty";
             public static final String GROUP = "student_group";
-            public static final String TELEPHONE = "telephone";
             public static final String FIO = "fio";
             // JSON-строка
             public static final String SUBJECTS = "subjects";

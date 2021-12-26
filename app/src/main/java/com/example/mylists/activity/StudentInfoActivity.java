@@ -68,7 +68,6 @@ public class StudentInfoActivity extends AppCompatActivity {
         });
 
         ((EditText) findViewById(R.id.editGroup)).setText(s.getGroup());
-        ((EditText) findViewById(R.id.editTelephone)).setText(s.getTelephone());
         mSubjectListAdapter = new SubjectListAdapter(s.getSubjects(),StudentInfoActivity.this);
         ((ListView) findViewById(R.id.lvASI_Subjects)).setAdapter(mSubjectListAdapter);
 
@@ -238,7 +237,6 @@ public class StudentInfoActivity extends AppCompatActivity {
     public void clSave(View view) {
         s.setFIO(((EditText) findViewById(R.id.editFIO)).getText().toString());
         s.setGroup(((EditText) findViewById(R.id.editGroup)).getText().toString());
-        s.setTelephone(((EditText) findViewById(R.id.editTelephone)).getText().toString());
         Facultet facultet = facultetListAdapter.getItem(mySpinner.getSelectedItemPosition());
         s.setIdFaculty(facultet.getId());
         s.setNameFaculty(facultet.getName());
@@ -284,10 +282,6 @@ public class StudentInfoActivity extends AppCompatActivity {
         }
         if(TextUtils.isEmpty(((EditText) findViewById(R.id.editGroup)).getText().toString())){
             ((EditText) findViewById(R.id.editGroup)).setError("Не указана группа");
-            err = true;
-        }
-        if(!PhoneNumberUtils.isGlobalPhoneNumber(((EditText) findViewById(R.id.editTelephone) ).getText().toString())) {
-            ((EditText) findViewById(R.id.editTelephone)).setError("Не указан валидный номер");
             err = true;
         }
         AlertDialog.Builder quitDialog = new AlertDialog.Builder(

@@ -29,7 +29,6 @@ public class DbOperations extends SQLiteOpenHelper {
             Student.StudentContract.StudentEntry.ID_FACULTY + " INTEGER NOT NULL " + "," +
             Student.StudentContract.StudentEntry.GROUP + " TEXT ," +
             Student.StudentContract.StudentEntry.SUBJECTS + " TEXT, " +
-            Student.StudentContract.StudentEntry.TELEPHONE + " TEXT, " +
             "FOREIGN KEY (" + Student.StudentContract.StudentEntry.ID_FACULTY + ")" +
             " REFERENCES " + Facultet.FacultetContract.FacultetEntry.TABLE_NAME +
             "(" + Facultet.FacultetContract.FacultetEntry.ID + "));";
@@ -91,7 +90,6 @@ public class DbOperations extends SQLiteOpenHelper {
             contentValues.put(Student.StudentContract.StudentEntry.SUBJECTS, gson.toJson(student.getSubjects()));
             contentValues.put(Student.StudentContract.StudentEntry.FIO, student.getFIO());
             contentValues.put(Student.StudentContract.StudentEntry.GROUP, student.getGroup());
-            contentValues.put(Student.StudentContract.StudentEntry.TELEPHONE, student.getTelephone());
             db.insert(Student.StudentContract.StudentEntry.TABLE_NAME, null, contentValues);
             Log.d("Database operations", "One row inserted...");
         }
@@ -112,7 +110,6 @@ public class DbOperations extends SQLiteOpenHelper {
         contentValues.put(Student.StudentContract.StudentEntry.SUBJECTS, gson.toJson(student.getSubjects()));
         contentValues.put(Student.StudentContract.StudentEntry.FIO, student.getFIO());
         contentValues.put(Student.StudentContract.StudentEntry.GROUP, student.getGroup());
-        contentValues.put(Student.StudentContract.StudentEntry.TELEPHONE, student.getTelephone());
         db.update(Student.StudentContract.StudentEntry.TABLE_NAME, contentValues, Student.StudentContract.StudentEntry.ID + " = ?", new String[] {String.valueOf(student.getId())});
     }
     @SuppressLint("Range")
@@ -136,7 +133,6 @@ public class DbOperations extends SQLiteOpenHelper {
                 Student.StudentContract.StudentEntry.FIO,
                         Student.StudentContract.StudentEntry.SUBJECTS,
                         Student.StudentContract.StudentEntry.ID_FACULTY,
-                        Student.StudentContract.StudentEntry.TELEPHONE,
                         Student.StudentContract.StudentEntry.GROUP
         };
         GsonBuilder builder = new GsonBuilder();
@@ -158,11 +154,9 @@ public class DbOperations extends SQLiteOpenHelper {
                     new TypeToken<ArrayList<Subject>>() {
                     }.getType()
             );
-            @SuppressLint("Range") String telephone = cursor.getString(
-                    cursor.getColumnIndex(Student.StudentContract.StudentEntry.TELEPHONE));
             @SuppressLint("Range") String group = cursor.getString(
                     cursor.getColumnIndex(Student.StudentContract.StudentEntry.GROUP));
-            Student student = new Student(fio, getFacultetById(db, id_faculty), group, telephone);
+            Student student = new Student(fio, getFacultetById(db, id_faculty), group);
             student.setSubjects(subjects);
             student.setId(id);
             MainActivity.mStudents.add(student);
