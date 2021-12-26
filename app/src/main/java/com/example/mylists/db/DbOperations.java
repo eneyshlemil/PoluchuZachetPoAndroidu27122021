@@ -31,7 +31,6 @@ public class DbOperations extends SQLiteOpenHelper {
             Student.StudentContract.StudentEntry.FIO + " TEXT ," +
             Student.StudentContract.StudentEntry.ID_FACULTY + " INTEGER NOT NULL " + "," +
             Student.StudentContract.StudentEntry.GROUP + " TEXT ," +
-            Student.StudentContract.StudentEntry.SUBJECTS + " TEXT, " +
             "FOREIGN KEY (" + Student.StudentContract.StudentEntry.ID_FACULTY + ")" +
             " REFERENCES " + Facultet.FacultetContract.FacultetEntry.TABLE_NAME +
             "(" + Facultet.FacultetContract.FacultetEntry.ID + "));";
@@ -40,6 +39,16 @@ public class DbOperations extends SQLiteOpenHelper {
             Facultet.FacultetContract.FacultetEntry.TABLE_NAME + "(" +
             Facultet.FacultetContract.FacultetEntry.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             Facultet.FacultetContract.FacultetEntry.NAME + " TEXT " + ");";
+
+    private static final String CREATE_SUBJECT_TABLE = "create table if not exists " +
+            Subject.SubjectContract.SubjectEntry.TABLE_NAME + "(" +
+            Subject.SubjectContract.SubjectEntry.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            Subject.SubjectContract.SubjectEntry.NAME + " TEXT ," +
+            Subject.SubjectContract.SubjectEntry.ID_STUDENT + " INTEGER NOT NULL " + "," +
+            Subject.SubjectContract.SubjectEntry.MARK + " INTEGER ," +
+            "FOREIGN KEY (" + Subject.SubjectContract.SubjectEntry.ID_STUDENT + ")" +
+            " REFERENCES " + Student.StudentContract.StudentEntry.TABLE_NAME +
+            "(" + Student.StudentContract.StudentEntry.ID + "));";
 
     /**
      * База данных создаётся
@@ -58,6 +67,7 @@ public class DbOperations extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_FACULTET_TABLE);
         db.execSQL(CREATE_STUDENT_TABLE);
+        db.execSQL(CREATE_SUBJECT_TABLE);
         Log.d(TAG, "Tables created...");
     }
 
@@ -108,7 +118,7 @@ public class DbOperations extends SQLiteOpenHelper {
      * @param db
      * @param student
      */
-    public void addInfo(SQLiteDatabase db, Student student) {
+    public void addInfoStudent(SQLiteDatabase db, Student student) {
         if(existStudent(db, student)) {
             updateStudent(db, student);
             Log.d("Database operations", "One row updated...");
@@ -117,10 +127,29 @@ public class DbOperations extends SQLiteOpenHelper {
             Gson gson = builder.create();
             ContentValues contentValues = new ContentValues();
             contentValues.put(Student.StudentContract.StudentEntry.ID_FACULTY, student.getIdFaculty());
-            contentValues.put(Student.StudentContract.StudentEntry.SUBJECTS, gson.toJson(student.getSubjects()));
             contentValues.put(Student.StudentContract.StudentEntry.FIO, student.getFIO());
             contentValues.put(Student.StudentContract.StudentEntry.GROUP, student.getGroup());
             db.insert(Student.StudentContract.StudentEntry.TABLE_NAME, null, contentValues);
+            Log.d(TAG, "One row inserted...");
+        }
+    }
+
+    /**
+     * Добавление инфы о предмете или обновление
+     * @param db
+     */
+    public void addInfoSubject(SQLiteDatabase db, Subject subject) {
+        if(existSubject(db, subject)) {
+            updateSubject(db, subject);
+            Log.d("Database operations", "One row updated...");
+        } else {
+            GsonBuilder builder = new GsonBuilder();
+            Gson gson = builder.create();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(Subject.SubjectContract.SubjectEntry.ID_STUDENT, subject.getStudentId());
+            contentValues.put(Subject.SubjectContract.SubjectEntry.NAME, subject.getName());
+            contentValues.put(Subject.SubjectContract.SubjectEntry.MARK, subject.getMark());
+            db.insert(Subject.SubjectContract.SubjectEntry.TABLE_NAME, null, contentValues);
             Log.d(TAG, "One row inserted...");
         }
     }
@@ -140,16 +169,38 @@ public class DbOperations extends SQLiteOpenHelper {
     }
 
     /**
+     * Удаление предмета
+     * @param db
+     */
+    public void deleteStudent(SQLiteDatabase db, Subject subject) {
+        if(existSubject(db, subject)) {
+            db.delete(
+                    Subject.SubjectContract.SubjectEntry.TABLE_NAME,
+                    Subject.SubjectContract.SubjectEntry.ID + " = ?",
+                    new String[]{String.valueOf(subject.getId())});
+        }
+    }
+
+    /**
+     * Обновление предмета
+     * @param db
+     */
+    public void updateSubject(SQLiteDatabase db, Subject subject) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Subject.SubjectContract.SubjectEntry.ID_STUDENT, subject.getStudentId());
+        contentValues.put(Subject.SubjectContract.SubjectEntry.NAME, subject.getName());
+        contentValues.put(Subject.SubjectContract.SubjectEntry.MARK, subject.getMark());
+        db.update(Subject.SubjectContract.SubjectEntry.TABLE_NAME, contentValues, Subject.SubjectContract.SubjectEntry.ID + " = ?", new String[] {String.valueOf(subject.getId())});
+    }
+
+    /**
      * Обновление студента
      * @param db
      * @param student
      */
     public void updateStudent(SQLiteDatabase db, Student student) {
-        GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder.create();
         ContentValues contentValues = new ContentValues();
         contentValues.put(Student.StudentContract.StudentEntry.ID_FACULTY, student.getIdFaculty());
-        contentValues.put(Student.StudentContract.StudentEntry.SUBJECTS, gson.toJson(student.getSubjects()));
         contentValues.put(Student.StudentContract.StudentEntry.FIO, student.getFIO());
         contentValues.put(Student.StudentContract.StudentEntry.GROUP, student.getGroup());
         db.update(Student.StudentContract.StudentEntry.TABLE_NAME, contentValues, Student.StudentContract.StudentEntry.ID + " = ?", new String[] {String.valueOf(student.getId())});
@@ -186,7 +237,6 @@ public class DbOperations extends SQLiteOpenHelper {
         String[] projections = {
                 Student.StudentContract.StudentEntry.ID,
                 Student.StudentContract.StudentEntry.FIO,
-                        Student.StudentContract.StudentEntry.SUBJECTS,
                         Student.StudentContract.StudentEntry.ID_FACULTY,
                         Student.StudentContract.StudentEntry.GROUP
         };
@@ -205,17 +255,9 @@ public class DbOperations extends SQLiteOpenHelper {
                     cursor.getColumnIndex(Student.StudentContract.StudentEntry.ID));
             @SuppressLint("Range") String fio = cursor.getString(
                     cursor.getColumnIndex(Student.StudentContract.StudentEntry.FIO));
-            @SuppressLint("Range") ArrayList<Subject> subjects = gson.fromJson(
-                    cursor.getString(
-                            cursor.getColumnIndex(
-                                    Student.StudentContract.StudentEntry.SUBJECTS)
-                    ),
-                    new TypeToken<ArrayList<Subject>>() {}.getType()
-            );
             @SuppressLint("Range") String group = cursor.getString(
                     cursor.getColumnIndex(Student.StudentContract.StudentEntry.GROUP));
             Student student = new Student(fio, getFacultetById(db, id_faculty), group);
-            student.setSubjects(subjects);
             student.setId(id);
             MainActivity.mStudents.add(student);
         }
@@ -260,6 +302,23 @@ public class DbOperations extends SQLiteOpenHelper {
         };
         String selection = Student.StudentContract.StudentEntry.ID + "= ?";
         String [] selectionArgs = new String[] {String.valueOf(student.getId())};
+        Cursor cursor = db.query(Student.StudentContract.StudentEntry.TABLE_NAME,
+                projections,selection,selectionArgs,
+                null,null,null );
+        return cursor.getCount() > 0;
+    }
+
+    /**
+     * Проверка существует ли оценка по предмету
+     * @param db
+     * @return
+     */
+    public boolean existSubject(SQLiteDatabase db, Subject subject) {
+        String[] projections = {
+                Student.StudentContract.StudentEntry.ID
+        };
+        String selection = Student.StudentContract.StudentEntry.ID + "= ?";
+        String [] selectionArgs = new String[] {String.valueOf(subject.getId())};
         Cursor cursor = db.query(Student.StudentContract.StudentEntry.TABLE_NAME,
                 projections,selection,selectionArgs,
                 null,null,null );

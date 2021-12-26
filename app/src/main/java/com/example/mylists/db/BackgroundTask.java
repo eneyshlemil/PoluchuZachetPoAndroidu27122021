@@ -11,8 +11,6 @@ import com.example.mylists.model.Student;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.util.Comparator;
-
 public class BackgroundTask extends AsyncTask<String, Void, String> {
     @SuppressLint("StaticFieldLeak")
     Context context;
@@ -29,7 +27,7 @@ public class BackgroundTask extends AsyncTask<String, Void, String> {
             SQLiteDatabase db = dbOperations.getWritableDatabase();
             Student student = gson.fromJson(strings[1], Student.class);
             Log.d("Add", student.getFIO());
-            dbOperations.addInfo(db, student);
+            dbOperations.addInfoStudent(db, student);
         }
         else if(method.equals("delete_student")) {
             SQLiteDatabase db = dbOperations.getWritableDatabase();

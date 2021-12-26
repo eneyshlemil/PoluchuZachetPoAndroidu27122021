@@ -169,15 +169,7 @@ public class Student implements Parcelable {
             public static final String ID_FACULTY = "id_faculty";
             public static final String GROUP = "student_group";
             public static final String FIO = "fio";
-            // JSON-строка
-            public static final String SUBJECTS = "subjects";
             public static final String TABLE_NAME = "student_table";
         }
-        // N : N connection
-       /* public static abstract class StudentSubjectEntry {
-            public static final String ID_STUDENT = "id_student";
-            public static final String ID_SUBJECT = "id_subject";
-            public static final String
-        }*/
     }
 }

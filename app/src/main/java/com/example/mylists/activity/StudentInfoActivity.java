@@ -179,6 +179,7 @@ public class StudentInfoActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(),"Дисциплина не указана", Toast.LENGTH_SHORT).show();
                 }else{
                     s.addSubject(new Subject(
+                            s.getId(),
                             mName.getText().toString(),
                             Integer.parseInt(mMark.getSelectedItem().toString())
                     ));
@@ -208,6 +209,7 @@ public class StudentInfoActivity extends AppCompatActivity {
                     ((EditText) findViewById(R.id.editDialog_SubjectName)).setError("Не указана дисциплина");
                 }
                 s.addSubject(new Subject(
+                        s.getId(),
                         mName.getText().toString(),
                         Integer.parseInt(mMark.getSelectedItem().toString())
                 ));

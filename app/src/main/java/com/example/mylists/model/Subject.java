@@ -6,10 +6,14 @@ import android.os.Parcelable;
 public class Subject implements Parcelable {
     String mName;
     Integer mMark;
+    Integer mId;
+    Integer mStudentId;
 
-    public Subject(String name, Integer mark) {
+    public Subject(Integer studentId,String name, Integer mark) {
         mName = name;
         mMark = mark;
+        mStudentId = studentId;
+        mId = -1;
     }
 
     protected Subject(Parcel in) {
@@ -65,6 +69,14 @@ public class Subject implements Parcelable {
         return mMark;
     }
 
+    public Integer getId() {
+        return mId;
+    }
+
+    public Integer getStudentId() {
+        return mStudentId;
+    }
+
     @Override
     public String toString() {
         return "Subject{" +
@@ -72,12 +84,13 @@ public class Subject implements Parcelable {
                 ", mMark=" + mMark +
                 '}';
     }
-    /*
     public static final class SubjectContract {
         public static abstract class SubjectEntry {
             public static final String ID = "id";
+            public static final String ID_STUDENT = "id_student";
             public static final String NAME = "name";
             public static final String MARK = "mark";
+            public static final String TABLE_NAME = "subject_table";
         }
-    }*/
+    }
 }
