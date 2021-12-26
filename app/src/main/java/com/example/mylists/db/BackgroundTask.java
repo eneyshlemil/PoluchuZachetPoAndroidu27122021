@@ -1,8 +1,10 @@
 package com.example.mylists.db;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.example.mylists.activity.MainActivity;
 import com.example.mylists.model.Student;
@@ -12,6 +14,7 @@ import com.google.gson.GsonBuilder;
 import java.util.Comparator;
 
 public class BackgroundTask extends AsyncTask<String, Void, String> {
+    @SuppressLint("StaticFieldLeak")
     Context context;
     public BackgroundTask(Context context) {
         this.context = context;
@@ -25,22 +28,24 @@ public class BackgroundTask extends AsyncTask<String, Void, String> {
         if(method.equals("add_info")) {
             SQLiteDatabase db = dbOperations.getWritableDatabase();
             Student student = gson.fromJson(strings[1], Student.class);
-            System.out.println("student from json: " + student);
+            Log.d("Add", student.getFIO());
             dbOperations.addInfo(db, student);
         }
         else if(method.equals("delete_student")) {
             SQLiteDatabase db = dbOperations.getWritableDatabase();
             Student student = gson.fromJson(strings[1], Student.class);
-            System.out.println("student from json before delete: " + student);
+            Log.d("Delete", student.getFIO());
             dbOperations.deleteStudent(db, student);
         }
         else if(method.equals("get_students")) {
             SQLiteDatabase db = dbOperations.getReadableDatabase();
             int facultyId = Integer.parseInt(strings[1]);
+            Log.d("Get ", "students");
             dbOperations.getAllStudents(db, facultyId);
         }
         else if(method.equals("get_facultets")) {
             SQLiteDatabase db = dbOperations.getReadableDatabase();
+            Log.d("Get ", "facultets");
             dbOperations.addFacultets(db);
         }
         return null;

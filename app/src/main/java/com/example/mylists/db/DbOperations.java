@@ -21,7 +21,10 @@ import java.util.Collections;
 
 public class DbOperations extends SQLiteOpenHelper {
     private static final int DB_VERSION = 1;
+    private final String TAG = "DB operation";
+
     private static final String DB_NAME = "students.db";
+
     private static final String CREATE_STUDENT_TABLE = "create table if not exists " +
             Student.StudentContract.StudentEntry.TABLE_NAME + "(" +
             Student.StudentContract.StudentEntry.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -37,36 +40,54 @@ public class DbOperations extends SQLiteOpenHelper {
             Facultet.FacultetContract.FacultetEntry.TABLE_NAME + "(" +
             Facultet.FacultetContract.FacultetEntry.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             Facultet.FacultetContract.FacultetEntry.NAME + " TEXT " + ");";
+
     DbOperations(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
-        Log.d("Database operations", "Database created...");
+        Log.d(TAG, "Database created...");
     }
 
+    /**
+     * При создании создаём таблички, если их нет
+     * @param db
+     */
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_FACULTET_TABLE);
         db.execSQL(CREATE_STUDENT_TABLE);
-        Log.d("Database operations", "Tables created...");
+        Log.d(TAG, "Tables created...");
     }
+
+    /**
+     * Добавление факультет
+     * @param db
+     */
     public void addFacultets(SQLiteDatabase db) {
         if(isEmptyFacultyTable(db)) {
             MainActivity.mFacultets.clear();
-            MainActivity.mFacultets.add(new Facultet("KPM", 1));
-            MainActivity.mFacultets.add(new Facultet("URFAC", 2));
-            MainActivity.mFacultets.add(new Facultet("RGF", 3));
+            MainActivity.mFacultets.add(new Facultet("ФКТиПМ", 1));
+            MainActivity.mFacultets.add(new Facultet("ФИСМО", 2));
+            MainActivity.mFacultets.add(new Facultet("Матфак", 3));
+            MainActivity.mFacultets.add(new Facultet("Юрфак", 4));
+            MainActivity.mFacultets.add(new Facultet("ФУП", 5));
             System.out.println("isEmptyFacultyTable(db) == true");
             for (Facultet facultet : MainActivity.mFacultets) {
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(Facultet.FacultetContract.FacultetEntry.NAME, facultet.getName());
                 db.insert(Facultet.FacultetContract.FacultetEntry.TABLE_NAME, null, contentValues);
             }
-            Log.d("Database operations", "Facultets inserted into empty " +
+            Log.d(TAG, "Facultets inserted into empty " +
                     Facultet.FacultetContract.FacultetEntry.TABLE_NAME + "...");
         } else {
-            System.out.println("isEmptyFacultyTable(db) == false");
+            Log.d(TAG, "isEmptyFacultyTable(db) == false");
             getAllFacultets(db);
         }
     }
+
+    /**
+     * Проверка является ли таблица факультетов пустой
+     * @param db
+     * @return
+     */
     public boolean isEmptyFacultyTable(SQLiteDatabase db) {
         String[] projections = {
                 Facultet.FacultetContract.FacultetEntry.ID
@@ -77,6 +98,12 @@ public class DbOperations extends SQLiteOpenHelper {
                 null,null,null );
         return cursor.getCount() == 0;
     }
+
+    /**
+     * Добавление инфы о студенте или обновление
+     * @param db
+     * @param student
+     */
     public void addInfo(SQLiteDatabase db, Student student) {
         if(existStudent(db, student)) {
             updateStudent(db, student);
@@ -91,9 +118,15 @@ public class DbOperations extends SQLiteOpenHelper {
             contentValues.put(Student.StudentContract.StudentEntry.FIO, student.getFIO());
             contentValues.put(Student.StudentContract.StudentEntry.GROUP, student.getGroup());
             db.insert(Student.StudentContract.StudentEntry.TABLE_NAME, null, contentValues);
-            Log.d("Database operations", "One row inserted...");
+            Log.d(TAG, "One row inserted...");
         }
     }
+
+    /**
+     * Удаление студента
+     * @param db
+     * @param student
+     */
     public void deleteStudent(SQLiteDatabase db, Student student) {
         if(existStudent(db, student)) {
             db.delete(
@@ -102,6 +135,12 @@ public class DbOperations extends SQLiteOpenHelper {
                     new String[]{String.valueOf(student.getId())});
         }
     }
+
+    /**
+     * Обновление студента
+     * @param db
+     * @param student
+     */
     public void updateStudent(SQLiteDatabase db, Student student) {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
@@ -112,6 +151,13 @@ public class DbOperations extends SQLiteOpenHelper {
         contentValues.put(Student.StudentContract.StudentEntry.GROUP, student.getGroup());
         db.update(Student.StudentContract.StudentEntry.TABLE_NAME, contentValues, Student.StudentContract.StudentEntry.ID + " = ?", new String[] {String.valueOf(student.getId())});
     }
+
+    /**
+     * Получение факультета по id
+     * @param db
+     * @param id
+     * @return
+     */
     @SuppressLint("Range")
     public Facultet getFacultetById(SQLiteDatabase db, int id) {
         String[] projections = {
@@ -127,6 +173,12 @@ public class DbOperations extends SQLiteOpenHelper {
         String name = cursor.getString(cursor.getColumnIndex(Facultet.FacultetContract.FacultetEntry.NAME));
         return new Facultet(name, id);
     }
+
+    /**
+     * Получение списка студентов по id факультета
+     * @param db
+     * @param id_faculty
+     */
     public void getAllStudents(SQLiteDatabase db, int id_faculty) {
         String[] projections = {
                 Student.StudentContract.StudentEntry.ID,
@@ -162,6 +214,12 @@ public class DbOperations extends SQLiteOpenHelper {
             MainActivity.mStudents.add(student);
         }
     }
+
+    /**
+     * Получение списка факультетов
+     *
+     * @param db
+     */
     public void getAllFacultets(SQLiteDatabase db) {
         String[] projections = {
                 Facultet.FacultetContract.FacultetEntry.ID,
@@ -183,6 +241,13 @@ public class DbOperations extends SQLiteOpenHelper {
         }
 
     }
+
+    /**
+     * Проверка существует ли студент
+     * @param db
+     * @param student
+     * @return
+     */
     public boolean existStudent(SQLiteDatabase db, Student student) {
         String[] projections = {
                 Student.StudentContract.StudentEntry.ID
@@ -194,6 +259,7 @@ public class DbOperations extends SQLiteOpenHelper {
                 null,null,null );
         return cursor.getCount() > 0;
     }
+
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
 

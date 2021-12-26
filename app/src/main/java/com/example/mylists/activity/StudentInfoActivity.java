@@ -41,6 +41,8 @@ public class StudentInfoActivity extends AppCompatActivity {
     private Spinner mySpinner;
     private FacultetListAdapter facultetListAdapter;
     private int currentIdFacultetChose;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
