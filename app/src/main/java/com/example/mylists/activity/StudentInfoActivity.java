@@ -151,7 +151,8 @@ public class StudentInfoActivity extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(),"Дисциплина не указана", Toast.LENGTH_SHORT).show();
                             }
                             else{
-                                s.changeSubject(position,mName.getText().toString(),Integer.parseInt(mMark.getSelectedItem().toString()));
+                                mSubjects.get(position).setName(mName.getText().toString());
+                                mSubjects.get(position).setMark(Integer.parseInt(mMark.getSelectedItem().toString()));
                                 mSubjectListAdapter.notifyDataSetChanged();
                             }
                         }
@@ -183,6 +184,7 @@ public class StudentInfoActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 
     public void addSubject(View view) {
         AlertDialog.Builder inputDialog = new AlertDialog.Builder(StudentInfoActivity.this);
