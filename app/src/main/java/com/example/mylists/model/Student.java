@@ -34,6 +34,10 @@ public class Student implements Parcelable {
         this.id = id;
     }
 
+    /**
+     * Сравнение студентов
+     * @return
+     */
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public boolean equals(Object o) {
