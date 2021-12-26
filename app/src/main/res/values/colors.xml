@@ -15,4 +15,6 @@
     <color name="colorPrimaryVariant">#000000</color>
     <color name="colorSecondary">#05633A</color>
     <color name="colorSecondaryVariant">#03512F</color>
+    <color name="detailingWindowFont">#FFF</color>
+    <color name="detailingWindow">#111</color>
 </resources>

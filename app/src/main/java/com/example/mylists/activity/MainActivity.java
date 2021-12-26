@@ -384,7 +384,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     ((TextView) findViewById(R.id.tvInfo_FIO)).setText(mStudents.get(position).getFIO());
                     ((TextView) findViewById(R.id.tvInfo_Fac)).setText(mStudents.get(position).getNameFaculty());
                     ((TextView) findViewById(R.id.tvInfo_Group)).setText(mStudents.get(position).getGroup());
-//  del                  ((TextView) findViewById(R.id.tvInfo_Phone)).setText(mStudents.get(position).getNameFaculty());
                     checkedItemPosition = position;
                 }else {
                     ((LinearLayout) findViewById(R.id.ll_info_student)).setVisibility(View.GONE);
@@ -392,7 +391,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     listView.setSelected(false);
                     checkedItemPosition = -1;
                 }
-                mStudentListAdapter.colorChecked(position,parent);
+//                mStudentListAdapter.colorChecked(position,parent);
             }
         };
         listView.setOnItemClickListener(clStudent);
