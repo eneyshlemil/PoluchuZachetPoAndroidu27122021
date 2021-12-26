@@ -135,6 +135,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public boolean onLongClick(View view) {
                 Collections.sort(mStudents,new CompareByFio());
                 mStudentListAdapter.notifyDataSetChanged();
+                ((LinearLayout) findViewById(R.id.ll_info_student)).setVisibility(View.GONE);
+                ListView listView = findViewById(R.id.lvList2);
+                listView.setItemChecked(checkedItemPosition,false);
+                listView.setSelected(false);
+                checkedItemPosition = -1;
                 return false;
             }
         };
@@ -144,6 +149,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public boolean onLongClick(View view) {
                 Collections.sort(mStudents,new CompareByFaculty());
                 mStudentListAdapter.notifyDataSetChanged();
+                ((LinearLayout) findViewById(R.id.ll_info_student)).setVisibility(View.GONE);
+                ListView listView = findViewById(R.id.lvList2);
+                listView.setItemChecked(checkedItemPosition,false);
+                listView.setSelected(false);
+                checkedItemPosition = -1;
                 return false;
             }
         };
@@ -153,6 +163,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public boolean onLongClick(View view) {
                 Collections.sort(mStudents,new CompareByGroup());
                 mStudentListAdapter.notifyDataSetChanged();
+                ((LinearLayout) findViewById(R.id.ll_info_student)).setVisibility(View.GONE);
+                ListView listView = findViewById(R.id.lvList2);
+                listView.setItemChecked(checkedItemPosition,false);
+                listView.setSelected(false);
+                checkedItemPosition = -1;
                 return false;
             }
         };
