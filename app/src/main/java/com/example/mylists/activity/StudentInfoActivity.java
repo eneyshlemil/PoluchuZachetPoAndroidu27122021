@@ -53,6 +53,9 @@ public class StudentInfoActivity extends AppCompatActivity {
         facultets = getIntent().getParcelableArrayListExtra("facultets");
         System.out.println("facultets in StudentInfoActivity " + facultets);
         ((EditText) findViewById(R.id.editFIO)).setText(s.getFIO());
+        /**
+         *  Спиннер для выбора факультета
+         */
         mySpinner = (Spinner) findViewById(R.id.editFaculty);
         facultetListAdapter = new FacultetListAdapter(this, android.R.layout.simple_spinner_item, facultets);
         mySpinner.setAdapter(facultetListAdapter);
