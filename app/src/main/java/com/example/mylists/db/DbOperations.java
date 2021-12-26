@@ -140,9 +140,10 @@ public class DbOperations extends SQLiteOpenHelper {
      * @param db
      */
     public void addInfoSubject(SQLiteDatabase db, Subject subject) {
+        Log.d("addInfoSubject", "start");
         if(existSubject(db, subject)) {
             updateSubject(db, subject);
-            Log.d("Database operations", "One row updated...");
+            Log.d("addInfoSubject", "update");
         } else {
             GsonBuilder builder = new GsonBuilder();
             Gson gson = builder.create();
@@ -151,7 +152,7 @@ public class DbOperations extends SQLiteOpenHelper {
             contentValues.put(Subject.SubjectContract.SubjectEntry.NAME, subject.getName());
             contentValues.put(Subject.SubjectContract.SubjectEntry.MARK, subject.getMark());
             db.insert(Subject.SubjectContract.SubjectEntry.TABLE_NAME, null, contentValues);
-            Log.d(TAG, "One row inserted...");
+            Log.d("addInfoSubject", "insert");
         }
     }
 
@@ -173,7 +174,7 @@ public class DbOperations extends SQLiteOpenHelper {
      * Удаление предмета
      * @param db
      */
-    public void deleteStudent(SQLiteDatabase db, Subject subject) {
+    public void deleteSubject(SQLiteDatabase db, Subject subject) {
         if(existSubject(db, subject)) {
             db.delete(
                     Subject.SubjectContract.SubjectEntry.TABLE_NAME,
@@ -348,11 +349,11 @@ public class DbOperations extends SQLiteOpenHelper {
      */
     public boolean existSubject(SQLiteDatabase db, Subject subject) {
         String[] projections = {
-                Student.StudentContract.StudentEntry.ID
+                Subject.SubjectContract.SubjectEntry.ID
         };
-        String selection = Student.StudentContract.StudentEntry.ID + "= ?";
+        String selection =  Subject.SubjectContract.SubjectEntry.ID + "= ?";
         String [] selectionArgs = new String[] {String.valueOf(subject.getId())};
-        Cursor cursor = db.query(Student.StudentContract.StudentEntry.TABLE_NAME,
+        Cursor cursor = db.query( Subject.SubjectContract.SubjectEntry.TABLE_NAME,
                 projections,selection,selectionArgs,
                 null,null,null );
         return cursor.getCount() > 0;

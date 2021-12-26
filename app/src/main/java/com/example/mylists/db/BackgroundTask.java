@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.example.mylists.activity.MainActivity;
 import com.example.mylists.model.Student;
+import com.example.mylists.model.Subject;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -51,6 +52,18 @@ public class BackgroundTask extends AsyncTask<String, Void, String> {
             int studentId = Integer.parseInt(strings[1]);
             Log.d("Get ", "students");
             dbOperations.getAllSubjects(db, studentId);
+        }
+        else if(method.equals("add_subject_info")) {
+            SQLiteDatabase db = dbOperations.getWritableDatabase();
+            Subject subject = gson.fromJson(strings[1], Subject.class);
+            Log.d("Add", subject.getName());
+            dbOperations.addInfoSubject(db, subject);
+        }
+        else if(method.equals("delete_subject")) {
+            SQLiteDatabase db = dbOperations.getWritableDatabase();
+            Subject subject = gson.fromJson(strings[1], Subject.class);
+            Log.d("Delete", subject.getName());
+            dbOperations.deleteSubject(db, subject);
         }
         return null;
     }

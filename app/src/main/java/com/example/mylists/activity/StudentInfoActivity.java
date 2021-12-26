@@ -55,8 +55,7 @@ public class StudentInfoActivity extends AppCompatActivity {
         s = getIntent().getParcelableExtra("student");
         facultets = getIntent().getParcelableArrayListExtra("facultets");
         System.out.println("facultets in StudentInfoActivity " + facultets);
-        if (null == mSubjects) createSubjectList();
-        loadStudentsFromDB();
+
         ((EditText) findViewById(R.id.editFIO)).setText(s.getFIO());
         /**
          *  Спиннер для выбора факультета
@@ -78,6 +77,16 @@ public class StudentInfoActivity extends AppCompatActivity {
         });
 
         ((EditText) findViewById(R.id.editGroup)).setText(s.getGroup());
+    }
+
+    /**
+     * Вывод всех дисциплин для студента
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        createSubjectList();
+        loadStudentsFromDB();
     }
 
     /**
@@ -163,6 +172,7 @@ public class StudentInfoActivity extends AppCompatActivity {
             case R.id.miDeleteSub:{
                 if(listView.isSelected()) {
                     deleteSubject(position);
+
                 }else {
                     Toast.makeText(getApplicationContext(),
                             "Дисциплина не выбрана", Toast.LENGTH_SHORT).show();
@@ -215,6 +225,20 @@ public class StudentInfoActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Сохранение общей инфы о предмете
+     */
+    public void saveData(Subject subject) {
+        // проверка на существование записи о предмете
+        // если есть запись, то изменить предмет
+        // если нет то этот блок
+        BackgroundTask backgroundTask = new BackgroundTask(this);
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+        backgroundTask.execute("add_subject_info", gson.toJson(subject));
+
+    }
+
     public void editSubject(View view) {
         AlertDialog.Builder inputDialog = new AlertDialog.Builder(StudentInfoActivity.this);
         inputDialog.setTitle("Информация о дисциплине");
@@ -252,6 +276,7 @@ public class StudentInfoActivity extends AppCompatActivity {
         quitDialog.setPositiveButton("Да", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                deleteData(mSubjects.get(position));
                 mSubjects.remove(position);
                 mSubjectListAdapter.notifyDataSetChanged();
             }
@@ -263,6 +288,16 @@ public class StudentInfoActivity extends AppCompatActivity {
                     }
                 });
         quitDialog.show();
+    }
+
+    /**
+     * Удаление предмета
+     */
+    public void deleteData(Subject subject) {
+        BackgroundTask backgroundTask = new BackgroundTask(this);
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+        backgroundTask.execute("delete_subject", gson.toJson(subject));
     }
 
     public void clSave(View view) {
@@ -369,8 +404,15 @@ public class StudentInfoActivity extends AppCompatActivity {
         backgroundTask.execute("add_info", gson.toJson(student));
 
     }
+
     @Override
     protected void onStop() {
         super.onStop();
+        if (mSubjects != null){
+            for(Subject subject: mSubjects) {
+                Log.d("Subjects", "saveData");
+                saveData(subject);
+            }
+        }
     }
 }

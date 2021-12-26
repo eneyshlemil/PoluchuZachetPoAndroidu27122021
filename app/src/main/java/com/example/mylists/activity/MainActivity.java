@@ -327,7 +327,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     quitDialog.setPositiveButton("Да", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            // TODO
                             // удалить студента в БД
                             deleteData(mStudents.get(position));
                             mStudents.remove(position);
