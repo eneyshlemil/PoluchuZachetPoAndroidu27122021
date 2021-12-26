@@ -424,6 +424,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             oldStudents.addAll(mStudents);
             mapIdFacultyToStudents.put(mFacultySelectedId, oldStudents);
             mFacultySelectedId = facultet.getId();
+            ((LinearLayout) findViewById(R.id.ll_info_student)).setVisibility(View.GONE);
+            ListView listView = findViewById(R.id.lvList2);
+            listView.setItemChecked(checkedItemPosition,false);
+            listView.setSelected(false);
+            checkedItemPosition = -1;
             loadStudents();
         }
         else {
