@@ -1,7 +1,5 @@
 package com.example.mylists.activity;
 
-import static android.Manifest.permission.CALL_PHONE;
-
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -10,19 +8,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.Menu;
@@ -35,7 +27,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.mylists.R;
-import com.example.mylists.adapter.FacultetListAdapter;
 import com.example.mylists.adapter.StudentListAdapter;
 import com.example.mylists.compare.CompareByFaculty;
 import com.example.mylists.compare.CompareByFio;
@@ -59,33 +50,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static ArrayList<Student> mStudents;
     @SuppressLint("StaticFieldLeak")
     public static StudentListAdapter mStudentListAdapter;
-    FacultetListAdapter facultetListAdapter;
-    SharedPreferences mPreferences;
     public static ArrayList<Facultet> mFacultets;
-    Menu menu;
-    public static int currentId = -1;
+    public static int mFacultySelectedId = -1;
     public static Map<Integer, ArrayList<Student>> mapIdFacultyToStudents;
     private static DrawerLayout drawer;
     private static NavigationView navigationView;
     private static boolean was_updated = false;
-    public void phone_calling(View view,int position) {
-        String phone_number = mStudents.get(position).getTelephone();
-        Intent callIntent = new Intent(Intent.ACTION_CALL);
-        callIntent.setData(Uri.parse("tel:" + phone_number));
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) !=
-                PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{
-                    Manifest.permission.CALL_PHONE
-            }, 1);
-        } else {
-            try {
-                startActivity(callIntent);
-            } catch (SecurityException e) {
-                e.printStackTrace();
-            }
-        }
 
-    }
+    /**
+     * Загрузка списка факультетов в список навигации
+     */
     public static void loadFacultyIntoNavigationView() {
         Menu drawerMenu = navigationView.getMenu();
         if(mFacultets != null && !mFacultets.isEmpty()) {
@@ -97,10 +71,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             was_updated = true;
         }
     }
-    // TODO
+
+    /**
+     * Загрузка списка студентов, если выбран факультет
+     */
     public void loadStudents() {
         if(mFacultets == null) return;
-        Facultet currentFacultet = getById(currentId);
+        Facultet currentFacultet = getById(mFacultySelectedId);
         if(currentFacultet != null) {
             loadStudentsFromDB();
             System.out.println("currentFacultet");
@@ -108,6 +85,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mStudentListAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Сокрытие/пока пунктов добавления, удаления, редактирования
+     * @param menu
+     * @param hidden
+     */
     @SuppressLint("ResourceType")
     public void hideMenuForStudents(Menu menu, boolean hidden) {
         menu.findItem(R.id.miAdd).setVisible(!hidden);
@@ -115,9 +97,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         menu.findItem(R.id.miEdit).setVisible(!hidden);
     }
 
+    /**
+     * Вызов функции сокрытия пунктов меню при отстутствии выбранного факультета
+     * @param menu
+     */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if(currentId != -1) {
+        if(mFacultySelectedId != -1) {
             hideMenuForStudents(menu, false);
         } else {
             hideMenuForStudents(menu, true);
@@ -165,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             Intent intent = result.getData();
                             Student s = intent.getParcelableExtra("student");
                             if(mPosition  == mStudents.size() + 1) {
-                                if(s.getIdFaculty() != currentId) {
+                                if(s.getIdFaculty() != mFacultySelectedId) {
                                     ArrayList<Student> oldStudent = mapIdFacultyToStudents.get(s.getIdFaculty());
                                     if(oldStudent == null) {
                                         oldStudent = new ArrayList<Student>();
@@ -176,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 else mStudents.add(s);
                             }
                             else {
-                                if(s.getIdFaculty() != currentId) {
+                                if(s.getIdFaculty() != mFacultySelectedId) {
                                     ArrayList<Student> oldStudent = mapIdFacultyToStudents.get(s.getIdFaculty());
                                     if(oldStudent == null) {
                                         oldStudent = new ArrayList<Student>();
@@ -224,20 +210,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         };
 
-//        View.OnLongClickListener OLCL_Phone= new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View view) {
-//                Intent i = new Intent(Intent.ACTION_CALL);
-//                i.setData(Uri.parse("tel:"+mStudents.get(mPosition).getmPhone().toString()));
-//                if (ContextCompat.checkSelfPermission(getApplicationContext(), CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
-//                    startActivity(i);
-//                } else {
-//                    requestPermissions(new String[]{CALL_PHONE},1);
-//                }
-//                return false;
-//            }
-//        };
-
         ((LinearLayout) findViewById(R.id.llInfo_FIO)).setOnLongClickListener(OLCL_FIO);
         ((TextView) findViewById(R.id.tvInfo_FIO)).setOnLongClickListener(OLCL_FIO);
         ((TextView) findViewById(R.id.textView7)).setOnLongClickListener(OLCL_FIO);
@@ -247,13 +219,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ((LinearLayout) findViewById(R.id.llInfo_Group)).setOnLongClickListener(OLCL_Group);
         ((TextView) findViewById(R.id.tvInfo_Group)).setOnLongClickListener(OLCL_Group);
         ((TextView) findViewById(R.id.textView18)).setOnLongClickListener(OLCL_Group);
-//        ((LinearLayout) findViewById(R.id.llInfo_Phone)).setOnLongClickListener(OLCL_Phone);
-//        ((TextView) findViewById(R.id.tvInfo_Phone)).setOnLongClickListener(OLCL_Phone);
-//        ((TextView) findViewById(R.id.textView9)).setOnLongClickListener(OLCL_Phone);
     }
 
-
-
+    /**
+     * Получения факультета по выбранному пункту меню навигации
+     * @param id
+     * @return
+     */
     public static Facultet getById(int id) {
         for(Facultet facultet: mFacultets) {
             if(facultet.getId() == id) {
@@ -262,6 +234,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
        return null;
     }
+
+    /**
+     * Получение факультета по названию
+     * @param name
+     * @return
+     */
     public Facultet getByName(String name) {
         for(Facultet facultet : mFacultets) {
             if(facultet.getName().equals(name)) {
@@ -270,16 +248,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         return null;
     }
+
+    /**
+     * Загрузка списка факультетов
+     */
     public void createFacultetList() {
         if(mFacultets == null) mFacultets = new ArrayList<>();
         loadFacultets();
     }
+
+    /**
+     * Создание меню
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
 
+    /**
+     * Выбор пункта меню
+     *
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         ListView listView = findViewById(R.id.lvList2);
@@ -299,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     Intent intent = new Intent(MainActivity.this, StudentInfoActivity.class);
                     intent.putExtra("student", mStudents.get(position));
                     intent.putParcelableArrayListExtra("facultets", mFacultets);
-                    intent.putExtra("currentFacultet", currentId);
+                    intent.putExtra("currentFacultet", mFacultySelectedId);
                     mPosition=position;
                     mIntentActivityResultLauncher.launch(intent);
                 }else {
@@ -314,10 +308,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 //mStudents.add(new Student("",getById(currentId),"", ""));
                 //intent.putExtra("student", mStudents.get(mStudents.size()-1));
                 Student s = new Student();
-                s.setIdFaculty(currentId);
-                s.setNameFaculty(getById(currentId).getName());
+                s.setIdFaculty(mFacultySelectedId);
+                s.setNameFaculty(getById(mFacultySelectedId).getName());
                 intent.putExtra("student", s);
-                intent.putExtra("currentFacultet", currentId);
+                intent.putExtra("currentFacultet", mFacultySelectedId);
                 intent.putParcelableArrayListExtra("facultets", mFacultets);
                 mPosition=mStudents.size() + 1;
                 mIntentActivityResultLauncher.launch(intent);
@@ -369,6 +363,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Создание списка студентов
+     */
     public void createStudentList() {
         mStudents=new ArrayList<>();
         ListView listView = findViewById(R.id.lvList2);
@@ -397,6 +394,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         listView.setOnItemClickListener(clStudent);
     }
 
+    /**
+     * Сохраняем данные при остановке активити
+     */
     @Override
     protected void onStop() {
         super.onStop();
@@ -409,7 +409,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
     }
-    // TODO выбор элементов
+
+    /**
+     * Выбор пункта меню навигации
+     * @param item
+     * @return
+     */
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Facultet facultet = getByName((String) item.getTitle());
@@ -417,21 +422,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             System.out.println("facultet not null");
             ArrayList<Student> oldStudents = new ArrayList<>();
             oldStudents.addAll(mStudents);
-            mapIdFacultyToStudents.put(currentId, oldStudents);
-            currentId = facultet.getId();
+            mapIdFacultyToStudents.put(mFacultySelectedId, oldStudents);
+            mFacultySelectedId = facultet.getId();
             loadStudents();
         }
         else {
             System.out.println("facultet is null");
         }
+        item.setCheckable(true);
         return false;
     }
-   //TODO
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
 
-    }
-    // TODO сохранить общую информацию о студенте
+    /**
+     * Сохранение общей инфы о студенте
+     */
     public void saveData(Student student) {
         // проверка на существование записи о студенте
         // если есть запись, то изменить студента
@@ -443,11 +447,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         backgroundTask.execute("add_info", gson.toJson(student));
 
     }
+
+    /**
+     * Загрузка студентов из бд
+     */
     public void loadStudentsFromDB() {
-        if(currentId != -1) {
+        if(mFacultySelectedId != -1) {
             mStudents.clear();
-            if(mapIdFacultyToStudents.containsKey(currentId)) {
-                ArrayList<Student> oldStudents = mapIdFacultyToStudents.get(currentId);
+            if(mapIdFacultyToStudents.containsKey(mFacultySelectedId)) {
+                ArrayList<Student> oldStudents = mapIdFacultyToStudents.get(mFacultySelectedId);
                 if(!oldStudents.isEmpty()) {
                     mStudents.addAll(oldStudents);
                     mStudentListAdapter.notifyDataSetChanged();
@@ -458,17 +466,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 BackgroundTask backgroundTask = new BackgroundTask(this);
                 GsonBuilder builder = new GsonBuilder();
                 Gson gson = builder.create();
-                backgroundTask.execute("get_students", String.valueOf(getById(currentId).getId()));
+                backgroundTask.execute("get_students", String.valueOf(getById(mFacultySelectedId).getId()));
                 //mStudentListAdapter.notifyDataSetChanged();
             }
         }
     }
+
+    /**
+     * Удаление студента
+     * @param student
+     */
     public void deleteData(Student student) {
         BackgroundTask backgroundTask = new BackgroundTask(this);
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
         backgroundTask.execute("delete_student", gson.toJson(student));
     }
+
+    /**
+     * Загрузка факультетов
+     */
     public void loadFacultets() {
         if(mFacultets.isEmpty()) {
             BackgroundTask backgroundTask = new BackgroundTask(this);
