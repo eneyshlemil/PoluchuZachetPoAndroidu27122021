@@ -440,6 +440,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             navigationView.getMenu().getItem(i).setChecked(false);
         }
         item.setChecked(true);
+        DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout.closeDrawers();
         return false;
     }
 
