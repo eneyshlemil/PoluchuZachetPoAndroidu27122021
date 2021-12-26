@@ -415,7 +415,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onStop() {
         super.onStop();
-        System.out.println("onStop");
       if (mStudents != null){
            for(Student student: mStudents) {
                Log.d(TAG, "saveData");

@@ -75,6 +75,7 @@ public class StudentInfoActivity extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> adapter) {  }
         });
+        mySpinner.setSelection(s.getIdFaculty() - 1);
 
         ((EditText) findViewById(R.id.editGroup)).setText(s.getGroup());
     }

@@ -34,18 +34,18 @@ public class Student implements Parcelable {
         this.id = id;
     }
 
-    /**
-     * Сравнение студентов
-     * @return
-     */
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Student student = (Student) o;
-        return id == student.id && mFIO.equals(student.mFIO) && IdFaculty.equals(student.IdFaculty) && nameFaculty.equals(student.nameFaculty) && mGroup.equals(student.mGroup) && Objects.equals(mSubjects, student.mSubjects);
-    }
+//    /**
+//     * Сравнение студентов
+//     * @return
+//     */
+//    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        Student student = (Student) o;
+//        return id == student.id && mFIO.equals(student.mFIO) && IdFaculty.equals(student.IdFaculty) && nameFaculty.equals(student.nameFaculty) && mGroup.equals(student.mGroup) && Objects.equals(mSubjects, student.mSubjects);
+//    }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -163,7 +163,6 @@ public class Student implements Parcelable {
     }
 
     public static final class StudentContract {
-        // Student - Faculty N:1
         public static abstract class StudentEntry {
             public static final String ID = "id";
             public static final String ID_FACULTY = "id_faculty";
