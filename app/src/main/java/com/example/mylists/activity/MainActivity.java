@@ -434,9 +434,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         else {
             Log.d(TAG, "facultet is null");
         }
-        item.setCheckable(true);
+
+        navigationView = (NavigationView) findViewById(R.id.navigationView);
+        for (int i = 0; i < navigationView.getMenu().size(); i++) {
+            navigationView.getMenu().getItem(i).setChecked(false);
+        }
+        item.setChecked(true);
         return false;
     }
+
+
 
     /**
      * Сохранение общей инфы о студенте
