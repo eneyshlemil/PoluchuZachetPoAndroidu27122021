@@ -16,6 +16,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -56,60 +57,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static DrawerLayout drawer;
     private static NavigationView navigationView;
     private static boolean was_updated = false;
-
-    /**
-     * Загрузка списка факультетов в список навигации
-     */
-    public static void loadFacultyIntoNavigationView() {
-        Menu drawerMenu = navigationView.getMenu();
-        if(mFacultets != null && !mFacultets.isEmpty()) {
-            if(was_updated) return;
-            for (Facultet facultet : mFacultets) {
-
-                drawerMenu.add(facultet.getName());
-            }
-            was_updated = true;
-        }
-    }
-
-    /**
-     * Загрузка списка студентов, если выбран факультет
-     */
-    public void loadStudents() {
-        if(mFacultets == null) return;
-        Facultet currentFacultet = getById(mFacultySelectedId);
-        if(currentFacultet != null) {
-            loadStudentsFromDB();
-            System.out.println("currentFacultet");
-        }
-        mStudentListAdapter.notifyDataSetChanged();
-    }
-
-    /**
-     * Сокрытие/пока пунктов добавления, удаления, редактирования
-     * @param menu
-     * @param hidden
-     */
-    @SuppressLint("ResourceType")
-    public void hideMenuForStudents(Menu menu, boolean hidden) {
-        menu.findItem(R.id.miAdd).setVisible(!hidden);
-        menu.findItem(R.id.miDelete).setVisible(!hidden);
-        menu.findItem(R.id.miEdit).setVisible(!hidden);
-    }
-
-    /**
-     * Вызов функции сокрытия пунктов меню при отстутствии выбранного факультета
-     * @param menu
-     */
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        if(mFacultySelectedId != -1) {
-            hideMenuForStudents(menu, false);
-        } else {
-            hideMenuForStudents(menu, true);
-        }
-        return super.onPrepareOptionsMenu(menu);
-    }
+    private static String TAG = "MainActivity";
 
     @SuppressLint("ResourceType")
     @Override
@@ -137,8 +85,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         navigationView = (NavigationView) findViewById(R.id.navigationView);
         loadFacultyIntoNavigationView();
-        navigationView.setNavigationItemSelectedListener( this);
-        // disply home button for actionbar
+        navigationView.setNavigationItemSelectedListener(this);
         toolbar.setDisplayHomeAsUpEnabled(true);
 
 
@@ -219,6 +166,60 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ((LinearLayout) findViewById(R.id.llInfo_Group)).setOnLongClickListener(OLCL_Group);
         ((TextView) findViewById(R.id.tvInfo_Group)).setOnLongClickListener(OLCL_Group);
         ((TextView) findViewById(R.id.textView18)).setOnLongClickListener(OLCL_Group);
+    }
+
+    /**
+     * Загрузка списка факультетов в меню навигации
+     */
+    public static void loadFacultyIntoNavigationView() {
+        Menu drawerMenu = navigationView.getMenu();
+        if(mFacultets != null && !mFacultets.isEmpty()) {
+            if(was_updated) return;
+            for (Facultet facultet : mFacultets) {
+
+                drawerMenu.add(facultet.getName()).setCheckable(true);
+            }
+            was_updated = true;
+        }
+    }
+
+    /**
+     * Загрузка списка студентов, если выбран факультет
+     */
+    public void loadStudents() {
+        if(mFacultets == null) return;
+        Facultet currentFacultet = getById(mFacultySelectedId);
+        if(currentFacultet != null) {
+            loadStudentsFromDB();
+            Log.d(TAG, "loaded students");
+        }
+        mStudentListAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Сокрытие/пока пунктов добавления, удаления, редактирования
+     * @param menu
+     * @param hidden
+     */
+    @SuppressLint("ResourceType")
+    public void hideMenuForStudents(Menu menu, boolean hidden) {
+        menu.findItem(R.id.miAdd).setVisible(!hidden);
+        menu.findItem(R.id.miDelete).setVisible(!hidden);
+        menu.findItem(R.id.miEdit).setVisible(!hidden);
+    }
+
+    /**
+     * Вызов функции сокрытия пунктов меню при отстутствии выбранного факультета
+     * @param menu
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if(mFacultySelectedId != -1) {
+            hideMenuForStudents(menu, false);
+        } else {
+            hideMenuForStudents(menu, true);
+        }
+        return super.onPrepareOptionsMenu(menu);
     }
 
     /**
@@ -403,7 +404,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         System.out.println("onStop");
       if (mStudents != null){
            for(Student student: mStudents) {
-               System.out.println("saveData");
+               Log.d(TAG, "saveData");
                saveData(student);
            }
         }
@@ -419,7 +420,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Facultet facultet = getByName((String) item.getTitle());
         if(facultet != null) {
-            System.out.println("facultet not null");
+            Log.d(TAG, "facultet not null");
             ArrayList<Student> oldStudents = new ArrayList<>();
             oldStudents.addAll(mStudents);
             mapIdFacultyToStudents.put(mFacultySelectedId, oldStudents);
@@ -427,7 +428,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             loadStudents();
         }
         else {
-            System.out.println("facultet is null");
+            Log.d(TAG, "facultet is null");
         }
         item.setCheckable(true);
         return false;
