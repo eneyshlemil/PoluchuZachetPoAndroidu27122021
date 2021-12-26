@@ -41,13 +41,17 @@ public class DbOperations extends SQLiteOpenHelper {
             Facultet.FacultetContract.FacultetEntry.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             Facultet.FacultetContract.FacultetEntry.NAME + " TEXT " + ");";
 
+    /**
+     * База данных создаётся
+     * @param context
+     */
     DbOperations(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
         Log.d(TAG, "Database created...");
     }
 
     /**
-     * При создании создаём таблички, если их нет
+     * Создание таблиц, если их нет
      * @param db
      */
     @Override
@@ -58,7 +62,7 @@ public class DbOperations extends SQLiteOpenHelper {
     }
 
     /**
-     * Добавление факультет
+     * Добавление факультетов
      * @param db
      */
     public void addFacultets(SQLiteDatabase db) {
@@ -112,7 +116,6 @@ public class DbOperations extends SQLiteOpenHelper {
             GsonBuilder builder = new GsonBuilder();
             Gson gson = builder.create();
             ContentValues contentValues = new ContentValues();
-            System.out.println("student from json addInfo " + student);
             contentValues.put(Student.StudentContract.StudentEntry.ID_FACULTY, student.getIdFaculty());
             contentValues.put(Student.StudentContract.StudentEntry.SUBJECTS, gson.toJson(student.getSubjects()));
             contentValues.put(Student.StudentContract.StudentEntry.FIO, student.getFIO());
@@ -192,6 +195,9 @@ public class DbOperations extends SQLiteOpenHelper {
         MainActivity.mStudents.clear();
         String selection = Student.StudentContract.StudentEntry.ID_FACULTY + "= ?";
         String [] selectionArgs = new String[] {String.valueOf(id_faculty)};
+        /**
+         * имя таблицы, что достаём, условие, аргументы подставляемые в условие
+         */
         Cursor cursor = db.query(Student.StudentContract.StudentEntry.TABLE_NAME, projections,
                 selection,selectionArgs,null,null,null);
         while(cursor.moveToNext()) {
@@ -202,9 +208,9 @@ public class DbOperations extends SQLiteOpenHelper {
             @SuppressLint("Range") ArrayList<Subject> subjects = gson.fromJson(
                     cursor.getString(
                             cursor.getColumnIndex(
-                                    Student.StudentContract.StudentEntry.SUBJECTS)),
-                    new TypeToken<ArrayList<Subject>>() {
-                    }.getType()
+                                    Student.StudentContract.StudentEntry.SUBJECTS)
+                    ),
+                    new TypeToken<ArrayList<Subject>>() {}.getType()
             );
             @SuppressLint("Range") String group = cursor.getString(
                     cursor.getColumnIndex(Student.StudentContract.StudentEntry.GROUP));
