@@ -1,5 +1,7 @@
 package com.example.mylists.activity;
 
+import static android.Manifest.permission.CALL_PHONE;
+
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -35,6 +37,9 @@ import android.widget.Toast;
 import com.example.mylists.R;
 import com.example.mylists.adapter.FacultetListAdapter;
 import com.example.mylists.adapter.StudentListAdapter;
+import com.example.mylists.compare.CompareByFaculty;
+import com.example.mylists.compare.CompareByFio;
+import com.example.mylists.compare.CompareByGroup;
 import com.example.mylists.db.BackgroundTask;
 import com.example.mylists.model.Facultet;
 import com.example.mylists.model.Student;
@@ -43,6 +48,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -190,7 +196,64 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 }
         );
+
+        View.OnLongClickListener OLCL_FIO= new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                Collections.sort(mStudents,new CompareByFio());
+                mStudentListAdapter.notifyDataSetChanged();
+                return false;
+            }
+        };
+
+        View.OnLongClickListener OLCL_Fac= new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                Collections.sort(mStudents,new CompareByFaculty());
+                mStudentListAdapter.notifyDataSetChanged();
+                return false;
+            }
+        };
+
+        View.OnLongClickListener OLCL_Group= new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                Collections.sort(mStudents,new CompareByGroup());
+                mStudentListAdapter.notifyDataSetChanged();
+                return false;
+            }
+        };
+
+//        View.OnLongClickListener OLCL_Phone= new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View view) {
+//                Intent i = new Intent(Intent.ACTION_CALL);
+//                i.setData(Uri.parse("tel:"+mStudents.get(mPosition).getmPhone().toString()));
+//                if (ContextCompat.checkSelfPermission(getApplicationContext(), CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+//                    startActivity(i);
+//                } else {
+//                    requestPermissions(new String[]{CALL_PHONE},1);
+//                }
+//                return false;
+//            }
+//        };
+
+        ((LinearLayout) findViewById(R.id.llInfo_FIO)).setOnLongClickListener(OLCL_FIO);
+        ((TextView) findViewById(R.id.tvInfo_FIO)).setOnLongClickListener(OLCL_FIO);
+        ((TextView) findViewById(R.id.textView7)).setOnLongClickListener(OLCL_FIO);
+        ((LinearLayout) findViewById(R.id.llInfo_Fac)).setOnLongClickListener(OLCL_Fac);
+        ((TextView) findViewById(R.id.tvInfo_Fac)).setOnLongClickListener(OLCL_Fac);
+        ((TextView) findViewById(R.id.textView14)).setOnLongClickListener(OLCL_Fac);
+        ((LinearLayout) findViewById(R.id.llInfo_Group)).setOnLongClickListener(OLCL_Group);
+        ((TextView) findViewById(R.id.tvInfo_Group)).setOnLongClickListener(OLCL_Group);
+        ((TextView) findViewById(R.id.textView18)).setOnLongClickListener(OLCL_Group);
+//        ((LinearLayout) findViewById(R.id.llInfo_Phone)).setOnLongClickListener(OLCL_Phone);
+//        ((TextView) findViewById(R.id.tvInfo_Phone)).setOnLongClickListener(OLCL_Phone);
+//        ((TextView) findViewById(R.id.textView9)).setOnLongClickListener(OLCL_Phone);
     }
+
+
+
     public static Facultet getById(int id) {
         for(Facultet facultet: mFacultets) {
             if(facultet.getId() == id) {
@@ -308,7 +371,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void createStudentList() {
         mStudents=new ArrayList<>();
-        //mStudents.add(new Student("ABC", new Facultet("ghghg", 5), "3"));
         ListView listView = findViewById(R.id.lvList2);
         mStudentListAdapter=new StudentListAdapter(mStudents,this);
         listView.setAdapter(mStudentListAdapter);
@@ -333,15 +395,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 mStudentListAdapter.colorChecked(position,parent);
             }
         };
-//  del     AdapterView.OnItemLongClickListener longClickListenerStudent = new AdapterView.OnItemLongClickListener() {
-//            @Override
-//            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-//               phone_calling(view, position);
-//                return true;
-//            }
-//        };
         listView.setOnItemClickListener(clStudent);
-//  del      listView.setOnItemLongClickListener(longClickListenerStudent);
     }
 
     @Override
