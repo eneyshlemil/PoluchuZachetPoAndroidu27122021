@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 
 import com.example.mylists.R;
 import com.example.mylists.adapter.FacultetListAdapter;
+import com.example.mylists.adapter.StudentListAdapter;
 import com.example.mylists.adapter.SubjectListAdapter;
 import com.example.mylists.db.BackgroundTask;
 import com.example.mylists.model.Facultet;
@@ -37,6 +39,7 @@ public class StudentInfoActivity extends AppCompatActivity {
     private SubjectListAdapter mSubjectListAdapter;
     private Student s;
     private ArrayList<Facultet> facultets;
+    public static ArrayList<Subject> mSubjects;
     private int checkedItemPosition;
     private Spinner mySpinner;
     private FacultetListAdapter facultetListAdapter;
@@ -52,6 +55,8 @@ public class StudentInfoActivity extends AppCompatActivity {
         s = getIntent().getParcelableExtra("student");
         facultets = getIntent().getParcelableArrayListExtra("facultets");
         System.out.println("facultets in StudentInfoActivity " + facultets);
+        if (null == mSubjects) createSubjectList();
+        loadStudentsFromDB();
         ((EditText) findViewById(R.id.editFIO)).setText(s.getFIO());
         /**
          *  Спиннер для выбора факультета
@@ -73,25 +78,31 @@ public class StudentInfoActivity extends AppCompatActivity {
         });
 
         ((EditText) findViewById(R.id.editGroup)).setText(s.getGroup());
-        mSubjectListAdapter = new SubjectListAdapter(s.getSubjects(),StudentInfoActivity.this);
-        ((ListView) findViewById(R.id.lvASI_Subjects)).setAdapter(mSubjectListAdapter);
+    }
 
+    /**
+     * Создание списка предметов
+     */
+    public void createSubjectList() {
+        mSubjects=new ArrayList<>();
         ListView listView = findViewById(R.id.lvASI_Subjects);
+        mSubjectListAdapter=new SubjectListAdapter(mSubjects,StudentInfoActivity.this);
+        listView.setAdapter(mSubjectListAdapter);
         AdapterView.OnItemClickListener clSubject = new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        if(checkedItemPosition != position){
-                            listView.setItemChecked(position,true);
-                            listView.setSelected(true);
-                            checkedItemPosition = position;
-                        }else {
-                            listView.setItemChecked(position,false);
-                            listView.setSelected(false);
-                            checkedItemPosition = -1;
-                        }
-                        mSubjectListAdapter.colorChecked(position,parent);
-                    }
-                };
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(checkedItemPosition != position){
+                    listView.setItemChecked(position,true);
+                    listView.setSelected(true);
+                    checkedItemPosition = position;
+                }else {
+                    listView.setItemChecked(position,false);
+                    listView.setSelected(false);
+                    checkedItemPosition = -1;
+                }
+                mSubjectListAdapter.colorChecked(position,parent);
+            }
+        };
         listView.setOnItemClickListener(clSubject);
     }
 
@@ -121,7 +132,7 @@ public class StudentInfoActivity extends AppCompatActivity {
                     final EditText mName = vv.findViewById(R.id.editDialog_SubjectName);
                     final Spinner mMark = vv.findViewById(R.id.sDialog_Mark);
                     ((EditText) vv.findViewById(R.id.editDialog_SubjectName)).setText(
-                            s.getSubjects().get(position).getName()//subjName
+                            mSubjects.get(position).getName()//subjName
                     );
 
                     inputDialog.setPositiveButton("Сохранить", new DialogInterface.OnClickListener() {
@@ -178,11 +189,12 @@ public class StudentInfoActivity extends AppCompatActivity {
                 if(TextUtils.isEmpty(((EditText) vv.findViewById(R.id.editDialog_SubjectName)).getText().toString())){
                     Toast.makeText(getApplicationContext(),"Дисциплина не указана", Toast.LENGTH_SHORT).show();
                 }else{
-                    s.addSubject(new Subject(
+                    mSubjects.add(new Subject(
                             s.getId(),
                             mName.getText().toString(),
                             Integer.parseInt(mMark.getSelectedItem().toString())
                     ));
+                    Log.d("Count subjects:", String.valueOf(mSubjects.size()));
                     mSubjectListAdapter.notifyDataSetChanged();
                 }
 
@@ -190,6 +202,17 @@ public class StudentInfoActivity extends AppCompatActivity {
         })
                 .setNegativeButton("Отмена",null);
         inputDialog.show(); //NEW1011 end
+    }
+
+    /**
+     * Загрузка предметов из бд
+     */
+    public void loadStudentsFromDB() {
+        if(s.getId() != -1) {
+            mSubjects.clear();
+            BackgroundTask backgroundTask = new BackgroundTask(this);
+            backgroundTask.execute("get_subjects", String.valueOf(s.getId()));
+        }
     }
 
     public void editSubject(View view) {
@@ -208,11 +231,12 @@ public class StudentInfoActivity extends AppCompatActivity {
                 if(mName.toString().equals("")){
                     ((EditText) findViewById(R.id.editDialog_SubjectName)).setError("Не указана дисциплина");
                 }
-                s.addSubject(new Subject(
+                mSubjects.add(new Subject(
                         s.getId(),
                         mName.getText().toString(),
                         Integer.parseInt(mMark.getSelectedItem().toString())
                 ));
+                Log.d("Count subjects:", String.valueOf(mSubjects.size()));
                 mSubjectListAdapter.notifyDataSetChanged();
             }
         })
@@ -223,12 +247,12 @@ public class StudentInfoActivity extends AppCompatActivity {
     public void deleteSubject(int position){
         AlertDialog.Builder quitDialog = new AlertDialog.Builder(
                 StudentInfoActivity.this);
-        quitDialog.setTitle("Удалить дисциплину \"" + s.getSubjects().get(position).getName() + "\"?");
+        quitDialog.setTitle("Удалить дисциплину \"" + mSubjects.get(position).getName() + "\"?");
 
         quitDialog.setPositiveButton("Да", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                s.getSubjects().remove(position);
+                mSubjects.remove(position);
                 mSubjectListAdapter.notifyDataSetChanged();
             }
         })

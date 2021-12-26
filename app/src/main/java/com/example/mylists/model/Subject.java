@@ -77,6 +77,10 @@ public class Subject implements Parcelable {
         return mStudentId;
     }
 
+    public void setId(Integer mId) {
+        this.mId = mId;
+    }
+
     @Override
     public String toString() {
         return "Subject{" +

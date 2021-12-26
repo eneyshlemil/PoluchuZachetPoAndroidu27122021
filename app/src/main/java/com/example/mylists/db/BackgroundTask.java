@@ -46,6 +46,12 @@ public class BackgroundTask extends AsyncTask<String, Void, String> {
             Log.d("Get ", "facultets");
             dbOperations.addFacultets(db);
         }
+        else if(method.equals("get_subjects")) {
+            SQLiteDatabase db = dbOperations.getReadableDatabase();
+            int studentId = Integer.parseInt(strings[1]);
+            Log.d("Get ", "students");
+            dbOperations.getAllSubjects(db, studentId);
+        }
         return null;
     }
 

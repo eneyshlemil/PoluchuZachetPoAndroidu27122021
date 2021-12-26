@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.example.mylists.activity.MainActivity;
+import com.example.mylists.activity.StudentInfoActivity;
 import com.example.mylists.model.Facultet;
 import com.example.mylists.model.Student;
 import com.example.mylists.model.Subject;
@@ -260,6 +261,38 @@ public class DbOperations extends SQLiteOpenHelper {
             Student student = new Student(fio, getFacultetById(db, id_faculty), group);
             student.setId(id);
             MainActivity.mStudents.add(student);
+        }
+    }
+
+    /**
+     * Получение списка предметов по id студента
+     * @param db
+     */
+    public void getAllSubjects(SQLiteDatabase db, int id_student) {
+        String[] projections = {
+                Subject.SubjectContract.SubjectEntry.ID,
+                Subject.SubjectContract.SubjectEntry.NAME,
+                Subject.SubjectContract.SubjectEntry.ID_STUDENT,
+                Subject.SubjectContract.SubjectEntry.MARK,
+        };
+        StudentInfoActivity.mSubjects.clear();
+        String selection = Subject.SubjectContract.SubjectEntry.ID_STUDENT + "= ?";
+        String [] selectionArgs = new String[] {String.valueOf(id_student)};
+        /**
+         * имя таблицы, что достаём, условие, аргументы подставляемые в условие
+         */
+        Cursor cursor = db.query(Subject.SubjectContract.SubjectEntry.TABLE_NAME, projections,
+                selection,selectionArgs,null,null,null);
+        while(cursor.moveToNext()) {
+            @SuppressLint("Range") int id = cursor.getInt(
+                    cursor.getColumnIndex(Subject.SubjectContract.SubjectEntry.ID));
+            @SuppressLint("Range") String name = cursor.getString(
+                    cursor.getColumnIndex(Subject.SubjectContract.SubjectEntry.NAME));
+            @SuppressLint("Range") Integer mark = cursor.getInt(
+                    cursor.getColumnIndex(Subject.SubjectContract.SubjectEntry.MARK));
+            Subject subject = new Subject(id_student, name, mark);
+            subject.setId(id);
+            StudentInfoActivity.mSubjects.add(subject);
         }
     }
 
